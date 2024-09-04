@@ -17,7 +17,8 @@ defmodule DesafioCli  do
       {:ok, :begin} -> handle_begin()
       {:ok, :commit} -> handle_commit()
       {:ok, :rollback} -> handle_rollback()
-      {:error, message} -> IO.puts("ERR #{message}")
+      {:syntax_error, message} -> handle_error("#{message} - Syntax error")
+      {:error, message} -> handle_error(message)
     end
     loop()
   end
@@ -29,9 +30,13 @@ defmodule DesafioCli  do
       ["BEGIN"] -> {:ok, :begin}
       ["COMMIT"] -> {:ok, :commit}
       ["ROLLBACK"] -> {:ok, :rollback}
+      ["SET", key] -> {:syntax_error, "SET <chave> <valor>"}
+      ["GET"] -> {:syntax_error, "GET <chave>"}
+      ["SET"] -> {:syntax_error, "SET <chave> <valor>"}
       _ -> {:error, "Invalid command or syntax error"}
     end
   end
+
 
   defp handle_set(key, value) do
     old_value = DesafioCli.DB.get(key)
@@ -64,8 +69,12 @@ defmodule DesafioCli  do
       nesting_level = DesafioCli.DB.get_transaction_stack_length()
       IO.puts(nesting_level)
     rescue
-      e in NoTransactionRollbackError -> IO.puts("ERR #{e.message}")
+      e in NoTransactionRollbackError -> handle_error(e.message)
     end
+  end
+
+  defp handle_error(message) do
+    IO.puts("ERR \"#{message}\"")
   end
 
 end
