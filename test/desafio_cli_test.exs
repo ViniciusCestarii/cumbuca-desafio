@@ -1,8 +1,10 @@
-defmodule DesafioCliTest do
+defmodule DesafioCli.CLITest do
   use ExUnit.Case
-  doctest DesafioCli
+  import ExUnit.CaptureIO
 
-  test "greets the world" do
-    assert DesafioCli.phrase() == "Hello, world!"
+  test "command output" do
+    assert capture_io(fn -> DesafioCli.main([]) end) =~ ">"
   end
+
+  # Adicione mais testes conforme necessário
 end
