@@ -11,16 +11,22 @@ defmodule DesafioCli  do
   defp loop() do
     IO.write("> ")
     command = IO.gets("") |> String.trim()
+
     case parse_command(command) do
       {:ok, :set, key, value} -> handle_set(key, value)
       {:ok, :get, key} -> handle_get(key)
       {:ok, :begin} -> handle_begin()
       {:ok, :commit} -> handle_commit()
       {:ok, :rollback} -> handle_rollback()
+      {:ok, :exit} ->
+        IO.puts("Exiting...")
       {:syntax_error, message} -> handle_error("#{message} - Syntax error")
       {:error, message} -> handle_error(message)
     end
-    loop()
+
+    unless command == "EXIT" do
+      loop()
+    end
   end
 
   defp parse_command(command) do
@@ -30,6 +36,7 @@ defmodule DesafioCli  do
       ["BEGIN"] -> {:ok, :begin}
       ["COMMIT"] -> {:ok, :commit}
       ["ROLLBACK"] -> {:ok, :rollback}
+      ["EXIT"] -> {:ok, :exit}
       ["SET", _] -> {:syntax_error, "SET <chave> <valor>"}
       ["GET"] -> {:syntax_error, "GET <chave>"}
       ["SET"] -> {:syntax_error, "SET <chave> <valor>"}
