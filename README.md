@@ -29,3 +29,14 @@ Run the container:
 ```bash
 docker run -it elixir-cli-desafio
 ```
+
+## Running tests with Docker
+Build the image:
+
+```bash
+docker build -t elixir-cli-desafio .
+```
+
+```bash
+docker run --rm elixir-cli-desafio mix test
+```

@@ -10,22 +10,32 @@ defmodule DesafioCli  do
 
   defp loop() do
     IO.write("> ")
-    command = IO.gets("") |> String.trim()
+    command = IO.gets("")
 
-    case parse_command(command) do
-      {:ok, :set, key, value} -> handle_set(key, value)
-      {:ok, :get, key} -> handle_get(key)
-      {:ok, :begin} -> handle_begin()
-      {:ok, :commit} -> handle_commit()
-      {:ok, :rollback} -> handle_rollback()
-      {:ok, :exit} ->
-        IO.puts("Exiting...")
-      {:syntax_error, message} -> handle_error("#{message} - Syntax error")
-      {:error, message} -> handle_error(message)
-    end
+    case command do
+      :eof ->
+        IO.puts("End of input detected. Exiting...")
+        :ok
 
-    unless command == "EXIT" do
-      loop()
+      _ ->
+        command = command |> String.trim()
+
+        case parse_command(command) do
+          {:ok, :set, key, value} -> handle_set(key, value)
+          {:ok, :get, key} -> handle_get(key)
+          {:ok, :begin} -> handle_begin()
+          {:ok, :commit} -> handle_commit()
+          {:ok, :rollback} -> handle_rollback()
+          {:ok, :exit} ->
+            IO.puts("Exiting...")
+
+          {:syntax_error, message} -> handle_error("#{message} - Syntax error")
+          {:error, message} -> handle_error(message)
+        end
+
+        unless command == "EXIT" do
+          loop()
+        end
     end
   end
 
@@ -48,9 +58,10 @@ defmodule DesafioCli  do
   defp handle_set(key, value) do
     old_value = DesafioCli.DB.get(key)
     DesafioCli.DB.set(key, value)
+
     case old_value do
       nil -> IO.puts("FALSE #{value}")
-      old_value -> IO.puts("TRUE #{value}")
+      ^old_value -> IO.puts("TRUE #{value}")
     end
   end
 

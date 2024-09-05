@@ -55,7 +55,7 @@ defmodule DesafioCli.DB do
   def rollback() do
     Agent.get_and_update(__MODULE__, fn state ->
       case state.txs do
-        [current_tx | rest] ->
+        [_ | rest] ->
           { {:ok }, %{state | txs: rest} }
         [] ->
           { {:error, :no_transaction_to_rollback}, state }
