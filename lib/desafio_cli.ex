@@ -20,7 +20,7 @@ defmodule DesafioCli  do
       _ ->
         command = command |> String.trim()
 
-        case parse_command(command) do
+        case DesafioCli.Parser.parse_command(command) do
           {:ok, :set, key, value} -> handle_set(key, value)
           {:ok, :get, key} -> handle_get(key)
           {:ok, :begin} -> handle_begin()
@@ -29,28 +29,13 @@ defmodule DesafioCli  do
           {:ok, :exit} ->
             IO.puts("Exiting...")
 
-          {:syntax_error, message} -> handle_error("#{message} - Syntax error")
+          {:error, :syntax_error, message} -> handle_error("#{message} - Syntax error")
           {:error, message} -> handle_error(message)
         end
 
         unless command == "EXIT" do
           loop()
         end
-    end
-  end
-
-  defp parse_command(command) do
-    case String.split(command, " ") do
-      ["SET", key, value] -> {:ok, :set, key, value}
-      ["GET", key] -> {:ok, :get, key}
-      ["BEGIN"] -> {:ok, :begin}
-      ["COMMIT"] -> {:ok, :commit}
-      ["ROLLBACK"] -> {:ok, :rollback}
-      ["EXIT"] -> {:ok, :exit}
-      ["SET", _] -> {:syntax_error, "SET <chave> <valor>"}
-      ["GET"] -> {:syntax_error, "GET <chave>"}
-      ["SET"] -> {:syntax_error, "SET <chave> <valor>"}
-      _ -> {:error, "Invalid command"}
     end
   end
 
