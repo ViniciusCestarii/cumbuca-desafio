@@ -30,10 +30,10 @@ defmodule DesafioCli  do
       ["BEGIN"] -> {:ok, :begin}
       ["COMMIT"] -> {:ok, :commit}
       ["ROLLBACK"] -> {:ok, :rollback}
-      ["SET", key] -> {:syntax_error, "SET <chave> <valor>"}
+      ["SET", _] -> {:syntax_error, "SET <chave> <valor>"}
       ["GET"] -> {:syntax_error, "GET <chave>"}
       ["SET"] -> {:syntax_error, "SET <chave> <valor>"}
-      _ -> {:error, "Invalid command or syntax error"}
+      _ -> {:error, "Invalid command"}
     end
   end
 
@@ -42,39 +42,44 @@ defmodule DesafioCli  do
     old_value = DesafioCli.DB.get(key)
     DesafioCli.DB.set(key, value)
     case old_value do
-      "NIL" -> IO.puts("FALSE #{value}")
+      nil -> IO.puts("FALSE #{value}")
       old_value -> IO.puts("TRUE #{value}")
     end
   end
 
   defp handle_get(key) do
-    IO.puts(DesafioCli.DB.get(key))
+   case DesafioCli.DB.get(key) do
+      nil -> IO.puts("NIL")
+      value -> IO.puts(value)
+    end
   end
 
   defp handle_begin() do
     DesafioCli.DB.begin()
-    nesting_level = DesafioCli.DB.get_transaction_stack_length()
-    IO.puts(nesting_level)
+    print_transaction_stack_length()
   end
 
   defp handle_commit() do
-    DesafioCli.DB.commit()
-    nesting_level = DesafioCli.DB.get_transaction_stack_length()
-    IO.puts(nesting_level)
+    case DesafioCli.DB.commit() do
+      { :ok } -> print_transaction_stack_length()
+      { :error, :no_transaction_to_commit } -> handle_error("No transaction to commit")
+    end
   end
 
   defp handle_rollback() do
-    try do
-      DesafioCli.DB.rollback()
-      nesting_level = DesafioCli.DB.get_transaction_stack_length()
-      IO.puts(nesting_level)
-    rescue
-      e in NoTransactionRollbackError -> handle_error(e.message)
+    case DesafioCli.DB.rollback() do
+      { :ok } -> print_transaction_stack_length()
+      { :error, :no_transaction_to_rollback } -> handle_error("No transaction to rollback")
     end
   end
 
   defp handle_error(message) do
     IO.puts("ERR \"#{message}\"")
+  end
+
+  defp print_transaction_stack_length() do
+    nesting_level = DesafioCli.DB.get_transaction_stack_length()
+    IO.puts(nesting_level)
   end
 
 end
