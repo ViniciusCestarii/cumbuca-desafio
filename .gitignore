@@ -25,4 +25,4 @@ desafio_cli-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 
-db_state.bin
+*.bin
