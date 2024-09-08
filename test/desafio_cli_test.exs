@@ -21,67 +21,23 @@ defmodule DesafioCli.CLITest do
     end
   end
 
+  # Test from https://github.com/appcumbuca/desafios/blob/master/desafio-back-end-pleno.md examples
+
   test "command output" do
     assert capture_io(fn -> DesafioCli.loop() end) =~ ">"
+  end >
+    TRY
+
+  test(
+    "Caso se tente invocar um comando que não seja um dos abaixo, deve ser emitido um erro apropriadamente"
+  ) do
+    output = capture_io([input: "TRY", capture_prompt: false], fn -> DesafioCli.loop() end)
+    assert extract_relevant_output(output) == "> ERR \"No command TRY\"\n"
   end
 
-  test "invalid command output" do
+  test "um comando seja chamado com sintaxe incorreta, deve também ser emitido um erro" do
     output =
-      capture_io([input: "HELLO", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
-
-    expected_output = "> ERR \"No command HELLO\"\n"
-
-    assert extract_relevant_output(output) == expected_output
-  end
-
-  test "exit command output" do
-    output =
-      capture_io([input: "EXIT", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
-
-    expected_output = "> Exiting...\n"
-    assert extract_relevant_output(output) == expected_output
-  end
-
-  test "SET command output" do
-    output =
-      capture_io([input: "SET 'key' value", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
-
-    expected_output = "> FALSE value\n"
-    assert extract_relevant_output(output) == expected_output
-  end
-
-  test "SET command output with key with spaces" do
-    output =
-      capture_io([input: "SET 'key with spaces' 'value'", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
-
-    expected_output = "> FALSE 'value'\n"
-    assert extract_relevant_output(output) == expected_output
-  end
-
-  test "SET command output with value with spaces" do
-    output =
-      capture_io(
-        [input: "SET 'key with spaces' \"value and more value\"", capture_prompt: false],
-        fn ->
-          DesafioCli.loop()
-        end
-      )
-
-    expected_output = "> FALSE value and more value\n"
-    assert extract_relevant_output(output) == expected_output
-  end
-
-  test "invalid SET command output" do
-    output =
-      capture_io([input: "SET nova-value", capture_prompt: false], fn ->
+      capture_io([input: "SET x", capture_prompt: false], fn ->
         DesafioCli.loop()
       end)
 
@@ -89,41 +45,85 @@ defmodule DesafioCli.CLITest do
     assert extract_relevant_output(output) == expected_output
   end
 
-  test "GET command output" do
+  # O comando SET deve definir o valor de uma chave. Caso a chave não exista, ela deve ser criada. Caso a chave já existe, ela será sobreescrita. O comando deve retornar se a chave já existia e o novo valor dela.
+
+  test "SET" do
     output =
-      capture_io([input: "GET 'key'", capture_prompt: false], fn ->
+      capture_io([input: "SET teste 1", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste 2", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE 2\n"
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  # O comando GET deve recuperar o valor de uma chave. Caso a chave não exista, deve ser retornado o valor NIL. Caso a chave exista, deve ser retornado o valor armazenado nela.
+
+  test "GET" do
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
         DesafioCli.loop()
       end)
 
     expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
-  end
-
-  test "GET command output with key with spaces" do
-    capture_io([input: "SET 'key with spaces' value", capture_prompt: false], fn ->
-      DesafioCli.loop()
-    end)
 
     output =
-      capture_io([input: "GET 'key with spaces'", capture_prompt: false], fn ->
+      capture_io([input: "SET teste 1", capture_prompt: false], fn ->
         DesafioCli.loop()
       end)
 
-    expected_output = "> value string\n"
+    expected_output = "> FALSE 1\n"
     assert extract_relevant_output(output) == expected_output
-  end
 
-  test "invalid GET command output" do
     output =
-      capture_io([input: "GET", capture_prompt: false], fn ->
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
         DesafioCli.loop()
       end)
 
-    expected_output = "> ERR \"GET <chave> - Syntax error\"\n"
+    expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
   end
 
-  test "BEGIN command output" do
+  # O comando BEGIN deve iniciar uma transação. Ele deve retornar o atual nível de transação - i.e. quantas transações abertas existem. O banco se inicia no nível de transação 0.
+
+  test "BEGIN" do
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste 1", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  test "BEGIN recursive transaction" do
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
         DesafioCli.loop()
@@ -142,48 +142,277 @@ defmodule DesafioCli.CLITest do
     assert extract_relevant_output(output) == expected_output
   end
 
-  test "COMMIT command output" do
-    output =
-      capture_io([input: "COMMIT", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
+  # O comando ROLLBACK deve encerrar uma transação sem aplicar suas alterações. Isto é, todas as alterações criadas na transação atual devem ser descartadas. Deve retornar o nível de transação após o rollback.
 
-    expected_output = "> ERR \"No transaction to commit\"\n"
+  test "ROLLBACK" do
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
 
-    capture_io([input: "BEGIN", capture_prompt: false], fn ->
-      DesafioCli.loop()
-    end)
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "COMMIT", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> DesafioCli.loop() end)
 
     expected_output = "> 0\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  test "ROLLBACK recursive transactions" do
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 2\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET foo bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE bar\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET bar baz", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE baz\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> bar\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> baz\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
 
     assert extract_relevant_output(output) == expected_output
   end
 
-  test "ROLLBACK command output" do
-    output =
-      capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
+  # O comando COMMIT deve encerrar a transação atual aplicando todas as suas alterações. Isto é, as alterações da transação atual devem ser
+  # inclusas nas alterações da transação inferior, ou, caso após o COMMIT estejamos no nível de transação 0, as transações devem ser efetivadas no
+  # banco. O comando COMMIT deve retornar o nível de transação após o commit.
 
-    expected_output = "> ERR \"No transaction to rollback\"\n"
+  test "COMMIT" do
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
 
-    capture_io([input: "BEGIN", capture_prompt: false], fn ->
-      DesafioCli.loop()
-    end)
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
-        DesafioCli.loop()
-      end)
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "COMMIT", capture_prompt: false], fn -> DesafioCli.loop() end)
 
     expected_output = "> 0\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  test "COMMIT recursive transactions" do
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 2\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET foo bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE bar\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET bar baz", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> FALSE baz\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> bar\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> baz\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "COMMIT", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> bar\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> baz\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> 0\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> NIL\n"
 
     assert extract_relevant_output(output) == expected_output
   end

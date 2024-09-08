@@ -70,7 +70,7 @@ defmodule DesafioCli do
 
       db_value ->
         case DesafioCli.Parser.parse_value(db_value) do
-          {:ok, value_data} -> IO.puts("#{value_data.value} #{value_data.type}")
+          {:ok, value_data} -> IO.puts(value_data.value)
           {:error, message} -> handle_error(message)
         end
     end
