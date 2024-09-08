@@ -66,22 +66,31 @@ defmodule DesafioCli.Parser do
     value = to_string(value)
 
     cond do
-      String.match?(value, ~r/^\d+$/) ->
-        {:ok, %{value: String.to_integer(value), type: :number}}
+      is_number_string(value) ->
+        {:ok, %{value: value, type: :number}}
 
-      value == "TRUE" ->
+      is_boolean_string(value) ->
         {:ok, %{value: value, type: :boolean}}
 
-      value == "FALSE" ->
-        {:ok, %{value: value, type: :boolean}}
-
-      String.starts_with?(value, "\"") and String.ends_with?(value, "\"") ->
+      is_string_with_backslash(value) ->
         trimmed_value = String.slice(value, 1..-2//1)
         {:ok, %{value: trimmed_value, type: :string}}
 
       true ->
         {:ok, %{value: value, type: :string}}
     end
+  end
+
+  defp is_number_string(value) do
+    String.match?(value, ~r/^\d+$/)
+  end
+
+  defp is_boolean_string(value) do
+    value in ["TRUE", "FALSE"]
+  end
+
+  defp is_string_with_backslash(value) do
+    String.starts_with?(value, "\"") and String.ends_with?(value, "\"")
   end
 
   def split_command(command) do

@@ -6,12 +6,4 @@ defmodule DesafioCli.Transformer do
       :string -> "\"#{value_data.value}\""
     end
   end
-
-  # def to_value_data(value) do
-  #   case value do
-  #     value when is_number(value) -> %{value: value, type: :number}
-  #     value when is_boolean(value) -> %{value: value, type: :boolean}
-  #     value when is_string(value) -> %{value: value, type: :string}
-  #   end
-  # end
 end
