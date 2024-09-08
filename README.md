@@ -15,6 +15,18 @@ Para buildar o projeto, use o comando `mix escript.build` nesta pasta.
 Isso irá gerar um binário com o mesmo nome do projeto na pasta.
 Executando o binário, sua CLI será executada.
 
+Executando binário no Linux:
+
+```bash
+./elixir_cli_desafio
+```
+
+Executando binário no Windows:
+
+```bash
+escript desafio_cli
+```
+
 
 ## Running with Docker
 
