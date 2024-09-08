@@ -1,4 +1,4 @@
-defmodule DesafioCli  do
+defmodule DesafioCli do
   def main(_args) do
     start_db()
     loop()
@@ -21,16 +21,29 @@ defmodule DesafioCli  do
         command = command |> String.trim()
 
         case DesafioCli.Parser.parse_command(command) do
-          {:ok, :set, key, value} -> handle_set(key, value)
-          {:ok, :get, key} -> handle_get(key)
-          {:ok, :begin} -> handle_begin()
-          {:ok, :commit} -> handle_commit()
-          {:ok, :rollback} -> handle_rollback()
+          {:ok, :set, key, value} ->
+            handle_set(key, value)
+
+          {:ok, :get, key} ->
+            handle_get(key)
+
+          {:ok, :begin} ->
+            handle_begin()
+
+          {:ok, :commit} ->
+            handle_commit()
+
+          {:ok, :rollback} ->
+            handle_rollback()
+
           {:ok, :exit} ->
             IO.puts("Exiting...")
 
-          {:error, :syntax_error, message} -> handle_error("#{message} - Syntax error")
-          {:error, message} -> handle_error(message)
+          {:error, :syntax_error, message} ->
+            handle_error("#{message} - Syntax error")
+
+          {:error, message} ->
+            handle_error(message)
         end
 
         unless command == "EXIT" do
@@ -38,7 +51,6 @@ defmodule DesafioCli  do
         end
     end
   end
-
 
   defp handle_set(key, value_data) do
     old_value = DesafioCli.DB.get(key)
@@ -51,12 +63,15 @@ defmodule DesafioCli  do
   end
 
   defp handle_get(key) do
-   case DesafioCli.DB.get(key) do
-      nil -> IO.puts("NIL")
-      db_value -> case DesafioCli.Parser.parse_value(db_value) do
-        {:ok, value_data} -> IO.puts("#{value_data.value} #{value_data.type}")
-        {:error, message} -> handle_error(message)
-      end
+    case DesafioCli.DB.get(key) do
+      nil ->
+        IO.puts("NIL")
+
+      db_value ->
+        case DesafioCli.Parser.parse_value(db_value) do
+          {:ok, value_data} -> IO.puts("#{value_data.value} #{value_data.type}")
+          {:error, message} -> handle_error(message)
+        end
     end
   end
 
@@ -67,15 +82,15 @@ defmodule DesafioCli  do
 
   defp handle_commit() do
     case DesafioCli.DB.commit() do
-      { :ok } -> print_transaction_stack_length()
-      { :error, :no_transaction_to_commit } -> handle_error("No transaction to commit")
+      {:ok} -> print_transaction_stack_length()
+      {:error, :no_transaction_to_commit} -> handle_error("No transaction to commit")
     end
   end
 
   defp handle_rollback() do
     case DesafioCli.DB.rollback() do
-      { :ok } -> print_transaction_stack_length()
-      { :error, :no_transaction_to_rollback } -> handle_error("No transaction to rollback")
+      {:ok} -> print_transaction_stack_length()
+      {:error, :no_transaction_to_rollback} -> handle_error("No transaction to rollback")
     end
   end
 
@@ -87,5 +102,4 @@ defmodule DesafioCli  do
     nesting_level = DesafioCli.DB.get_transaction_stack_length()
     IO.puts(nesting_level)
   end
-
 end

@@ -7,6 +7,7 @@ defmodule DesafioCli.CLITest do
   end
 
   test "can't SET value with numeric key" do
-    assert DesafioCli.Parser.parse_command("SET 1 teste") == {:error, :syntax_error, "Numeric keys are not allowed"}
+    assert DesafioCli.Parser.parse_command("SET 1 teste") ==
+             {:error, :syntax_error, "Numeric keys are not allowed"}
   end
 end

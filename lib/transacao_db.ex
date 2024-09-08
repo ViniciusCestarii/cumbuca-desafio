@@ -33,6 +33,7 @@ defmodule DesafioCli.DB do
     Agent.update(__MODULE__, fn state ->
       %{state | txs: [%{} | state.txs]}
     end)
+
     :ok
   end
 
@@ -41,24 +42,26 @@ defmodule DesafioCli.DB do
       case state.txs do
         [current_tx | [previous_tx | rest]] ->
           merged_tx = Map.merge(previous_tx, current_tx)
-          { {:ok}, %{state | txs: [merged_tx | rest]} }
+          {{:ok}, %{state | txs: [merged_tx | rest]}}
+
         [current_tx] ->
           new_db = Map.merge(state.db, current_tx)
-          { {:ok}, %{state | db: new_db, txs: []} }
+          {{:ok}, %{state | db: new_db, txs: []}}
+
         [] ->
-          { {:error, :no_transaction_to_commit}, state }
+          {{:error, :no_transaction_to_commit}, state}
       end
     end)
   end
-
 
   def rollback() do
     Agent.get_and_update(__MODULE__, fn state ->
       case state.txs do
         [_ | rest] ->
-          { {:ok }, %{state | txs: rest} }
+          {{:ok}, %{state | txs: rest}}
+
         [] ->
-          { {:error, :no_transaction_to_rollback}, state }
+          {{:error, :no_transaction_to_rollback}, state}
       end
     end)
   end
