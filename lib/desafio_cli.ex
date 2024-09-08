@@ -9,7 +9,7 @@ defmodule DesafioCli do
     {:ok, _} = DesafioCli.TransactionsDB.start_link(@db_file_path)
   end
 
-  defp loop() do
+  def loop() do
     IO.write("> ")
     command = IO.gets("")
 

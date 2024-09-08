@@ -97,8 +97,8 @@ defmodule DesafioCli.Parser do
     command
     # Temporarily replace escaped quotes
     |> String.replace(~r/\\\"/, "\u00AB")
-    # Split by spaces, keeping quoted strings intact
-    |> String.split(~r/\s+(?=(?:[^"'\\]*(?:'[^']*'|"[^"]*")?[^"'\\]*)*$)/, trim: true)
+    # Match quoted strings and regular words separately
+    |> String.split(~r/(?<!\\)\s+(?=(?:[^"']*(["'])(?:\\.|(?!\1).)*\1)*[^"']*$)/, trim: true)
     # Remove any extra spaces
     |> Enum.map(&String.trim/1)
     # Restore escaped quotes
