@@ -18,10 +18,9 @@ defmodule DesafioCli.Parser  do
       ["COMMIT"] -> {:ok, :commit}
       ["ROLLBACK"] -> {:ok, :rollback}
       ["EXIT"] -> {:ok, :exit}
-      ["SET", _] -> {:error, :syntax_error, "SET <chave> <valor>"}
-      ["GET"] -> {:error, :syntax_error, "GET <chave>"}
-      ["SET"] -> {:error, :syntax_error, "SET <chave> <valor>"}
-      _ -> {:error, "Invalid command"}
+      ["SET" | _] -> {:error, :syntax_error, "SET <chave> <valor>"}
+      ["GET" | _] -> {:error, :syntax_error, "GET <chave>"}
+      [invalid_command | _]-> {:error, "No command #{invalid_command}"}
     end
   end
 
@@ -36,7 +35,9 @@ defmodule DesafioCli.Parser  do
 
   def parse_key(key) do
     cond do
-      String.starts_with?(key, "'") and String.ends_with?(key, "'") -> {:ok, String.trim(key, "'")}
+      String.starts_with?(key, "'") and String.ends_with?(key, "'") ->
+                    trimmed_key = String.slice(key, 1..-2//1)
+                    {:ok, trimmed_key}
       String.contains?(key, " ") -> {:error, :syntax_error, "Keys cannot contain spaces"}
       String.match?(key, ~r/^\d+$/) -> {:error, :syntax_error, "Numeric keys are not allowed"}
 
@@ -45,38 +46,25 @@ defmodule DesafioCli.Parser  do
   end
 
   def parse_value(value) do
+    value = to_string(value)
     cond do
-      String.match?(value, ~r/^\d+$/) -> {:ok, String.to_integer(value)}
+      String.match?(value, ~r/^\d+$/) -> {:ok, %{value: String.to_integer(value), type: :number}}
+      value == "TRUE" -> {:ok, %{value: value, type: :boolean}}
+      value == "FALSE" -> {:ok, %{value: value, type: :boolean}}
       String.starts_with?(value, "\"") and String.ends_with?(value, "\"") ->
-        {:ok, String.trim(value, "\"")}
+        trimmed_value = String.slice(value, 1..-2//1)
+        {:ok, %{value: trimmed_value, type: :string}}
       true ->
-        {:ok, value }
+        {:ok, %{value: value, type: :string}}
     end
   end
 
   def split_command(command) do
     command
-    |> String.to_charlist()
-    |> Enum.reduce({[], [], false, false}, fn char, {parts, current_part, is_inside_double_quotes, is_inside_simple_quote} ->
-      case char do
-        ?" ->
-          {parts, current_part ++ [char], not is_inside_double_quotes, is_inside_simple_quote}
-
-        ?' ->
-          {parts, current_part ++ [char], is_inside_double_quotes, not is_inside_simple_quote}
-
-        ?\s when not is_inside_double_quotes and not is_inside_simple_quote ->
-          {parts ++ [List.to_string(current_part)], [], is_inside_double_quotes, is_inside_simple_quote}
-
-        _ ->
-          {parts, current_part ++ [char], is_inside_double_quotes, is_inside_simple_quote}
-      end
-    end)
-    |> fn {parts, current_part, is_inside_double_quotes, is_inside_simple_quote} ->
-      case is_inside_double_quotes or is_inside_simple_quote do
-        true -> parts ++ String.split(List.to_string(current_part), " ")
-        false -> parts ++ [List.to_string(current_part)]
-      end
-    end.()
+    |> String.replace(~r/\\\"/, "\u00AB")  # Temporarily replace escaped quotes
+    |> String.split(~r/\s+(?=(?:[^"]*"[^"]*")*[^"]*$)/, trim: true)  # Split by spaces, keeping quoted strings intact
+    |> Enum.map(&String.trim/1)  # Remove any extra spaces
+    |> Enum.map(&String.replace(&1, "\u00AB", "\""))  # Restore escaped quotes
   end
+
 end

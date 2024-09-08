@@ -40,20 +40,23 @@ defmodule DesafioCli  do
   end
 
 
-  defp handle_set(key, value) do
+  defp handle_set(key, value_data) do
     old_value = DesafioCli.DB.get(key)
-    DesafioCli.DB.set(key, value)
+    DesafioCli.DB.set(key, DesafioCli.Transformer.to_model_value(value_data))
 
     case old_value do
-      nil -> IO.puts("FALSE #{value}")
-      ^old_value -> IO.puts("TRUE #{value}")
+      nil -> IO.puts("FALSE #{value_data.value}")
+      ^old_value -> IO.puts("TRUE #{value_data.value}")
     end
   end
 
   defp handle_get(key) do
    case DesafioCli.DB.get(key) do
       nil -> IO.puts("NIL")
-      value -> IO.puts(value)
+      db_value -> case DesafioCli.Parser.parse_value(db_value) do
+        {:ok, value_data} -> IO.puts("#{value_data.value} #{value_data.type}")
+        {:error, message} -> handle_error(message)
+      end
     end
   end
 
