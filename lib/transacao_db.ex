@@ -3,16 +3,20 @@ defmodule DesafioCli.DB do
   Um banco de dados chave-valor com suporte a transações recursivas e persistência em arquivo.
   """
 
-  @file_path "db_state.bin"
-
-  def start_link() do
-    Agent.start_link(fn -> load_state() end, name: __MODULE__)
+  def start_link(db_file_path) do
+    Agent.start_link(
+      fn ->
+        DesafioCli.Persistence.start_link(db_file_path)
+        DesafioCli.Persistence.load_state()
+      end,
+      name: __MODULE__
+    )
   end
 
   def set(key, value) do
     Agent.update(__MODULE__, fn state ->
       new_state = update_state(state, key, value)
-      save_state(new_state)
+      DesafioCli.Persistence.save_state(new_state)
       new_state
     end)
   end
@@ -28,7 +32,6 @@ defmodule DesafioCli.DB do
     Agent.update(__MODULE__, fn state ->
       %{state | txs: [%{} | state.txs]}
     end)
-    :ok
   end
 
   def commit() do
@@ -37,13 +40,13 @@ defmodule DesafioCli.DB do
         [current_tx | [previous_tx | rest]] ->
           merged_tx = Map.merge(previous_tx, current_tx)
           new_state = %{state | txs: [merged_tx | rest]}
-          save_state(new_state)
+          DesafioCli.Persistence.save_state(new_state)
           {{:ok}, new_state}
 
         [current_tx] ->
           new_db = Map.merge(state.db, current_tx)
           new_state = %{state | db: new_db, txs: []}
-          save_state(new_state)
+          DesafioCli.Persistence.save_state(new_state)
           {{:ok}, new_state}
 
         [] ->
@@ -57,7 +60,7 @@ defmodule DesafioCli.DB do
       case state.txs do
         [_ | rest] ->
           new_state = %{state | txs: rest}
-          save_state(new_state)
+          DesafioCli.Persistence.save_state(new_state)
           {{:ok}, new_state}
 
         [] ->
@@ -66,11 +69,7 @@ defmodule DesafioCli.DB do
     end)
   end
 
-  def get_transaction_stack_length() do
-    Agent.get(__MODULE__, fn state -> length(state.txs) end)
-  end
-
-  defp update_state(state, key, value) do
+  def update_state(state, key, value) do
     case state.txs do
       [] ->
         new_db = Map.put(state.db, key, value)
@@ -82,24 +81,7 @@ defmodule DesafioCli.DB do
     end
   end
 
-  defp save_state(state) do
-    binary_data = :erlang.term_to_binary(state.db)
-    File.write!(@file_path, binary_data)
-  end
-
-  defp load_state() do
-    case File.read(@file_path) do
-      {:ok, binary_data} ->
-        db =
-          case :erlang.binary_to_term(binary_data) do
-            %{} = map -> map
-            _ -> %{}
-          end
-
-        %{db: db, txs: []}
-
-      {:error, _} ->
-        %{db: %{}, txs: []}
-    end
+  def get_transaction_stack_length() do
+    Agent.get(__MODULE__, fn state -> length(state.txs) end)
   end
 end

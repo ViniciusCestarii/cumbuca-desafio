@@ -4,8 +4,9 @@ defmodule DesafioCli do
     loop()
   end
 
+  @db_file_path "db_state.bin"
   defp start_db() do
-    {:ok, _} = DesafioCli.DB.start_link()
+    {:ok, _} = DesafioCli.DB.start_link(@db_file_path)
   end
 
   defp loop() do
