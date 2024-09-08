@@ -96,7 +96,7 @@ defmodule DesafioCli do
   end
 
   defp handle_error(message) do
-    IO.puts("ERR \"#{message}\"")
+    IO.puts( IO.ANSI.red() <> "ERR \"#{message}\"" <> IO.ANSI.reset())
   end
 
   defp print_transaction_stack_length() do

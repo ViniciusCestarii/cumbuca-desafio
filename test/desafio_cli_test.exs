@@ -14,12 +14,17 @@ defmodule DesafioCli.CLITest do
     :ok
   end
 
+  defp strip_ansi_colors(string) do
+    String.replace(string, ~r/\e\[\d+m/, "")
+  end
+
   defp extract_relevant_output(output) do
     case String.split(output, "> End of input detected. Exiting...", parts: 2) do
-      [relevant_output | _] -> relevant_output
-      _ -> output
+      [relevant_output | _] -> strip_ansi_colors(relevant_output)
+      _ -> strip_ansi_colors(output)
     end
   end
+
 
   # Test from https://github.com/appcumbuca/desafios/blob/master/desafio-back-end-pleno.md examples
 

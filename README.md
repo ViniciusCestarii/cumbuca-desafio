@@ -1,9 +1,16 @@
-# Template para Desafio CLI
+# Cumbuca desafio Elixir CLI
 
-Este template tem o objetivo de servir como 
-ponto de partida para a implementação de desafios
-de contratação da Cumbuca que envolvam implementar
-uma interface de linha de comando em Elixir.
+Solução do [desafio proposto pela Cumbuca](https://github.com/appcumbuca/desafios/blob/master/desafio-back-end-pleno.md)
+
+## Descrição
+
+O desafio consiste basicamente em criar uma CLI e um banco de dados key-value com a linguagem Elixir e apenas as suas bibliotecas nativas.
+
+## Solução
+
+A CLI foi implementada utilizando a biblioteca nativa IO do Elixir, onde o usuário pode interagir com o banco de dados key-value através de comandos como `SET`, `GET`, `BEGIN`, `ROLLBACK` e `COMMIT`.
+
+O banco de dados key-value foi implementado de forma persistente guardando os dados em um arquivo binário e suas transações e estado atual guardados em memória utilizando Map.
 
 ## Pré-requisitos
 
