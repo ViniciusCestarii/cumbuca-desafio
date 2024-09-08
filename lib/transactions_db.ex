@@ -1,4 +1,4 @@
-defmodule DesafioCli.DB do
+defmodule DesafioCli.TransactionsDB do
   @moduledoc """
   Um banco de dados chave-valor com suporte a transações recursivas e persistência em arquivo.
   """
@@ -6,8 +6,8 @@ defmodule DesafioCli.DB do
   def start_link(db_file_path) do
     Agent.start_link(
       fn ->
-        DesafioCli.Persistence.start_link(db_file_path)
-        DesafioCli.Persistence.load_state()
+        DesafioCli.PersistentDB.start_link(db_file_path)
+        DesafioCli.PersistentDB.load_state()
       end,
       name: __MODULE__
     )
@@ -16,7 +16,7 @@ defmodule DesafioCli.DB do
   def set(key, value) do
     Agent.update(__MODULE__, fn state ->
       new_state = update_state(state, key, value)
-      DesafioCli.Persistence.save_state(new_state)
+      DesafioCli.PersistentDB.save_state(new_state)
       new_state
     end)
   end
@@ -40,13 +40,13 @@ defmodule DesafioCli.DB do
         [current_tx | [previous_tx | rest]] ->
           merged_tx = Map.merge(previous_tx, current_tx)
           new_state = %{state | txs: [merged_tx | rest]}
-          DesafioCli.Persistence.save_state(new_state)
+          DesafioCli.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [current_tx] ->
           new_db = Map.merge(state.db, current_tx)
           new_state = %{state | db: new_db, txs: []}
-          DesafioCli.Persistence.save_state(new_state)
+          DesafioCli.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [] ->
@@ -60,7 +60,7 @@ defmodule DesafioCli.DB do
       case state.txs do
         [_ | rest] ->
           new_state = %{state | txs: rest}
-          DesafioCli.Persistence.save_state(new_state)
+          DesafioCli.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [] ->

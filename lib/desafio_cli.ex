@@ -6,7 +6,7 @@ defmodule DesafioCli do
 
   @db_file_path "db_state.bin"
   defp start_db() do
-    {:ok, _} = DesafioCli.DB.start_link(@db_file_path)
+    {:ok, _} = DesafioCli.TransactionsDB.start_link(@db_file_path)
   end
 
   defp loop() do
@@ -54,8 +54,8 @@ defmodule DesafioCli do
   end
 
   defp handle_set(key, value_data) do
-    old_value = DesafioCli.DB.get(key)
-    DesafioCli.DB.set(key, DesafioCli.Transformer.to_model_value(value_data))
+    old_value = DesafioCli.TransactionsDB.get(key)
+    DesafioCli.TransactionsDB.set(key, DesafioCli.Transformer.to_model_value(value_data))
 
     case old_value do
       nil -> IO.puts("FALSE #{value_data.value}")
@@ -64,7 +64,7 @@ defmodule DesafioCli do
   end
 
   defp handle_get(key) do
-    case DesafioCli.DB.get(key) do
+    case DesafioCli.TransactionsDB.get(key) do
       nil ->
         IO.puts("NIL")
 
@@ -77,19 +77,19 @@ defmodule DesafioCli do
   end
 
   defp handle_begin() do
-    DesafioCli.DB.begin()
+    DesafioCli.TransactionsDB.begin()
     print_transaction_stack_length()
   end
 
   defp handle_commit() do
-    case DesafioCli.DB.commit() do
+    case DesafioCli.TransactionsDB.commit() do
       {:ok} -> print_transaction_stack_length()
       {:error, :no_transaction_to_commit} -> handle_error("No transaction to commit")
     end
   end
 
   defp handle_rollback() do
-    case DesafioCli.DB.rollback() do
+    case DesafioCli.TransactionsDB.rollback() do
       {:ok} -> print_transaction_stack_length()
       {:error, :no_transaction_to_rollback} -> handle_error("No transaction to rollback")
     end
@@ -100,7 +100,7 @@ defmodule DesafioCli do
   end
 
   defp print_transaction_stack_length() do
-    nesting_level = DesafioCli.DB.get_transaction_stack_length()
+    nesting_level = DesafioCli.TransactionsDB.get_transaction_stack_length()
     IO.puts(nesting_level)
   end
 end

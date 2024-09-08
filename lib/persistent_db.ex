@@ -1,4 +1,4 @@
-defmodule DesafioCli.Persistence do
+defmodule DesafioCli.PersistentDB do
   def start_link(db_file_path) do
     Agent.start_link(
       fn ->
