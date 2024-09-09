@@ -421,4 +421,106 @@ defmodule DesafioCli.CLITest do
 
     assert extract_relevant_output(output) == expected_output
   end
+
+  # Por exemplo, abcd, a10, "uma string com espaços", "\"teste\"" "101" e "TRUE" são todas strings, com os valores abcd, a10, uma string com espaços, "teste", 101 e TRUE respectivamente.
+
+  test "SET string" do
+    output =
+      capture_io([input: "SET teste abcd", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE abcd\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> abcd\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste a10", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE a10\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> a10\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste \"uma string com espaços\"", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE uma string com espaços\n"
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> uma string com espaços\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste \"\"teste\"\"", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE \"teste\"\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> \"teste\"\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste \"101\"", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE 101\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 101\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste \"TRUE\"", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
 end
