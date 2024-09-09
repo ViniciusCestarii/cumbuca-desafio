@@ -28,6 +28,9 @@ defmodule DesafioCli do
           {:ok, :get, key} ->
             handle_get(key)
 
+          {:ok, :exists, key} ->
+            handle_exists(key)
+
           {:ok, :begin} ->
             handle_begin()
 
@@ -73,6 +76,13 @@ defmodule DesafioCli do
           {:ok, value_data} -> IO.puts(value_data.value)
           {:error, message} -> handle_error(message)
         end
+    end
+  end
+
+  defp handle_exists(key) do
+    case DesafioCli.TransactionsDB.exists?(key) do
+      true -> IO.puts("TRUE")
+      false -> IO.puts("FALSE")
     end
   end
 

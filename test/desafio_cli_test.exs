@@ -564,4 +564,199 @@ defmodule DesafioCli.CLITest do
 
     assert extract_relevant_output(output) == expected_output
   end
+
+  # Extra features
+
+  test "EXIT" do
+    output =
+      capture_io([input: "EXIT", capture_prompt: false], fn -> DesafioCli.loop() end)
+
+    expected_output = "> Exiting...\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  test "EXISTS" do
+    output =
+      capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste 1", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  test "EXISTS recursive transactions" do
+    output =
+      capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste 1", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 2\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET foo bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE bar\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET bar baz", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE baz\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS foo", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS foo", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 0\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS foo", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "EXISTS bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
 end

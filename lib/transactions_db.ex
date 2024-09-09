@@ -28,6 +28,12 @@ defmodule DesafioCli.TransactionsDB do
     end)
   end
 
+  def exists?(key) do
+    Agent.get(__MODULE__, fn state ->
+      Enum.any?(state.txs, fn tx -> Map.has_key?(tx, key) end) or Map.has_key?(state.db, key)
+    end)
+  end
+
   def begin() do
     Agent.update(__MODULE__, fn state ->
       %{state | txs: [%{} | state.txs]}

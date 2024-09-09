@@ -12,6 +12,8 @@ A CLI foi implementada utilizando a biblioteca nativa IO do Elixir, onde o usuá
 
 O banco de dados key-value foi implementado de forma persistente guardando os dados em um arquivo binário e suas transações e estado atual guardados em memória utilizando Map.
 
+Adicionados novos comandos: "EXIT" e "EXISTS".
+
 ## Pré-requisitos
 
 Primeiro, será necessário [instalar o Elixir](https://elixir-lang.org/install.html)
@@ -46,7 +48,7 @@ docker build -t elixir-cli-desafio .
 Run the container:
 
 ```bash
-docker run -it elixir-cli-desafio
+docker run -it --rm elixir-cli-desafio
 ```
 
 ## Running tests with Docker

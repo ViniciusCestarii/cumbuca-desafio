@@ -13,6 +13,12 @@ defmodule DesafioCli.Parser do
           error -> error
         end
 
+      ["EXISTS", key] ->
+        case parse_key(key) do
+          {:ok, parsed_key} -> {:ok, :exists, parsed_key}
+          error -> error
+        end
+
       ["BEGIN"] ->
         {:ok, :begin}
 
