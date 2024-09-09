@@ -76,6 +76,9 @@ defmodule DesafioCli.Parser do
         trimmed_value = String.slice(value, 1..-2//1)
         {:ok, %{value: trimmed_value, type: :string}}
 
+      is_nil_string(value) ->
+        {:error, :syntax_error, "NIL is not a valid value"}
+
       true ->
         {:ok, %{value: value, type: :string}}
     end
@@ -91,6 +94,10 @@ defmodule DesafioCli.Parser do
 
   defp is_string_with_backslash(value) do
     String.starts_with?(value, "\"") and String.ends_with?(value, "\"")
+  end
+
+  defp is_nil_string(value) do
+    value == "NIL"
   end
 
   def split_command(command) do

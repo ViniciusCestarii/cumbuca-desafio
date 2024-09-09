@@ -523,4 +523,45 @@ defmodule DesafioCli.CLITest do
 
     assert extract_relevant_output(output) == expected_output
   end
+
+  # NIL não pode ser inserido.
+
+  test "SET NIL" do
+    output =
+      capture_io([input: "SET teste NIL", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> ERR \"NIL is not a valid value - Syntax error\"\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> NIL\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    # NIL as a string can be inserted
+    output =
+      capture_io([input: "SET teste \"NIL\"", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE NIL\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "GET teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> NIL\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
 end
