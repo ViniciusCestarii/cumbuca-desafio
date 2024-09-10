@@ -4,7 +4,7 @@ Solução do [desafio proposto pela Cumbuca](https://github.com/appcumbuca/desaf
 
 ## Descrição
 
-O desafio consiste basicamente em criar uma CLI e um banco de dados key-value com a linguagem Elixir e usando apenas as suas bibliotecas nativas.
+O desafio é desenvolver uma interface de linha de comando (CLI) e um banco de dados key-value utilizando exclusivamente a linguagem Elixir e suas bibliotecas nativas.
 
 ## Solução
 
