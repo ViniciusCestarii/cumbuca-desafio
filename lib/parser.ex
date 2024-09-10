@@ -4,7 +4,10 @@ defmodule DesafioCli.Parser do
       ["SET", key, value] ->
         case parse_key_value(key, value) do
           {:ok, parsed_key, parsed_value} -> {:ok, :set, parsed_key, parsed_value}
-          error -> error
+          error -> case value == "NIL" do
+            true -> {:error, :syntax_error, "NIL is not a valid value - use DELETE <chave> instead"}
+            _ -> error
+          end
         end
 
       ["GET", key] ->
@@ -16,6 +19,12 @@ defmodule DesafioCli.Parser do
       ["EXISTS", key] ->
         case parse_key(key) do
           {:ok, parsed_key} -> {:ok, :exists, parsed_key}
+          error -> error
+        end
+
+      ["DELETE", key] ->
+        case parse_key(key) do
+          {:ok, parsed_key} -> {:ok, :delete, parsed_key}
           error -> error
         end
 
@@ -37,8 +46,29 @@ defmodule DesafioCli.Parser do
       ["GET" | _] ->
         {:error, :syntax_error, "GET <chave>"}
 
+      ["EXISTS" | _] ->
+        {:error, :syntax_error, "EXISTS <chave>"}
+
+      ["DELETE" | _] ->
+        {:error, :syntax_error, "DELETE <chave>"}
+
+      ["BEGIN" | _] ->
+        {:error, :syntax_error, "BEGIN"}
+
+      ["COMMIT" | _] ->
+        {:error, :syntax_error, "COMMIT"}
+
+      ["ROLLBACK" | _] ->
+        {:error, :syntax_error, "ROLLBACK"}
+
+      ["EXIT" | _] ->
+        {:error, :syntax_error, "EXIT"}
+
       [invalid_command | _] ->
         {:error, "No command #{invalid_command}"}
+
+      [ ] ->
+        {:error, "Write a command"}
     end
   end
 

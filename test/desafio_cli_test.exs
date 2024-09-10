@@ -532,7 +532,7 @@ defmodule DesafioCli.CLITest do
         DesafioCli.loop()
       end)
 
-    expected_output = "> ERR \"NIL is not a valid value - Syntax error\"\n"
+    expected_output = "> ERR \"NIL is not a valid value - use DELETE <chave> instead - Syntax error\"\n"
 
     assert extract_relevant_output(output) == expected_output
 
@@ -752,6 +752,235 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  test "DELETE" do
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste 1", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+  end
+
+  test "DELETE recursive transactions" do
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET teste ola", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE ola\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "BEGIN", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 2\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET foo bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE bar\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "SET bar baz", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE baz\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE foo", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE foo", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "COMMIT", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 1\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE foo", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> 0\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> TRUE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE foo", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE bar", capture_prompt: false], fn ->
+        DesafioCli.loop()
+      end)
+
+    expected_output = "> FALSE\n"
+
+    assert extract_relevant_output(output) == expected_output
+
+    output =
+      capture_io([input: "DELETE teste", capture_prompt: false], fn ->
         DesafioCli.loop()
       end)
 

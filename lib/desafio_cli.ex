@@ -31,6 +31,9 @@ defmodule DesafioCli do
           {:ok, :exists, key} ->
             handle_exists(key)
 
+          {:ok, :delete, key} ->
+            handle_delete(key)
+
           {:ok, :begin} ->
             handle_begin()
 
@@ -81,6 +84,13 @@ defmodule DesafioCli do
 
   defp handle_exists(key) do
     case DesafioCli.TransactionsDB.exists?(key) do
+      true -> IO.puts("TRUE")
+      false -> IO.puts("FALSE")
+    end
+  end
+
+  defp handle_delete(key) do
+    case DesafioCli.TransactionsDB.delete?(key) do
       true -> IO.puts("TRUE")
       false -> IO.puts("FALSE")
     end
