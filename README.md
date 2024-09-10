@@ -12,7 +12,56 @@ A CLI foi implementada utilizando a biblioteca nativa IO do Elixir, onde o usuá
 
 O banco de dados key-value foi implementado de forma persistente guardando os dados em um arquivo binário e suas transações e estado atual guardados em memória utilizando Map.
 
-Adicionados novos comandos: "EXIT" e "EXISTS".
+Adicionados novos comandos: `EXIT`, `EXISTS` e `DELETE`.
+
+## Commands
+
+### `SET <key> <value>`
+Sets the value associated with the specified key.
+
+returns: TRUE or FALSE if the key already exists and the value.
+
+### `GET <key>`
+
+Gets the value associated with the specified key.
+
+returns: The value associated with the key or NIL if the key does not exist.
+
+### `DELETE <key>`
+
+Deletes the value associated with the specified key.
+
+returns: TRUE or FALSE if the key exists.
+
+### `EXISTS <key>`
+
+Checks if the key exists.
+
+returns: TRUE or FALSE if the key exists.
+
+### `BEGIN`
+
+Starts a new transaction.
+
+returns: nesting level of transactions.
+
+### `ROLLBACK`
+
+Rolls back the current transaction.
+
+returns: nesting level of transactions.
+
+### `COMMIT`
+
+Commits the current transaction.
+
+returns: nesting level of transactions.
+
+### `EXIT`
+
+Exits the CLI.
+
+returns: Goodbye message.
 
 ## Pré-requisitos
 
