@@ -107,6 +107,8 @@ Build the image:
 docker build -t elixir-cli-desafio .
 ```
 
+Run the tests:
+
 ```bash
 docker run --rm elixir-cli-desafio mix test
 ```
