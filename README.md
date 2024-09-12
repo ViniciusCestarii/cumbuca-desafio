@@ -1,5 +1,7 @@
 # Cumbuca desafio Elixir CLI
 
+[![Build Status](https://github.com/ViniciusCestarii/cumbuca-desafio/actions/workflows/test.yml/badge.svg)](https://github.com/ViniciusCestarii/cumbuca-desafio/actions/workflows/test.yml)
+
 Solução do [desafio proposto pela Cumbuca](https://github.com/appcumbuca/desafios/blob/master/desafio-back-end-pleno.md)
 
 ## Descrição
