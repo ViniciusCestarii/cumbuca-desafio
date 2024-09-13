@@ -1,16 +1,18 @@
 # Cumbuca desafio Elixir CLI
 
+[![Build Status](https://github.com/ViniciusCestarii/cumbuca-desafio/actions/workflows/test.yml/badge.svg)](https://github.com/ViniciusCestarii/cumbuca-desafio/actions/workflows/test.yml)
+
 Solução do [desafio proposto pela Cumbuca](https://github.com/appcumbuca/desafios/blob/master/desafio-back-end-pleno.md)
 
 ## Descrição
 
-O desafio consiste basicamente em criar uma CLI e um banco de dados key-value com a linguagem Elixir e apenas as suas bibliotecas nativas.
+O desafio é desenvolver uma interface de linha de comando (CLI) e um banco de dados key-value utilizando exclusivamente a linguagem Elixir e suas bibliotecas nativas.
 
 ## Solução
 
 A CLI foi implementada utilizando a biblioteca nativa IO do Elixir, onde o usuário pode interagir com o banco de dados key-value através de comandos como `SET`, `GET`, `BEGIN`, `ROLLBACK` e `COMMIT`.
 
-O banco de dados key-value foi implementado de forma persistente guardando os dados em um arquivo binário e suas transações e estado atual guardados em memória utilizando Map.
+O banco de dados key-value foi implementado com persistência, armazenando os dados em um arquivo binário. As transações e o estado da aplicação são mantidos em memória utilizando estruturas `Map`.
 
 Adicionados novos comandos: `EXIT`, `EXISTS` e `DELETE`.
 
@@ -106,6 +108,8 @@ Build the image:
 ```bash
 docker build -t elixir-cli-desafio .
 ```
+
+Run the tests:
 
 ```bash
 docker run --rm elixir-cli-desafio mix test
