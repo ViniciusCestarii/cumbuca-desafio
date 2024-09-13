@@ -76,7 +76,7 @@ Executando o binário, sua CLI será executada.
 Executando binário no Linux:
 
 ```bash
-./elixir_cli_desafio
+./desafio_cli
 ```
 
 Executando binário no Windows:
